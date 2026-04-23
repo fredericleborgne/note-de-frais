@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Note de frais — FL Conseil & Patrimoine</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --border: #2e2e2e;
+    --accent: #c8a96e;
+    --accent2: #e8c98e;
+    --text: #f0ede8;
+    --text-muted: #888;
+    --success: #4caf7d;
+    --error: #e05555;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 36px;
+    padding-top: 16px;
+  }
+
+  .logo-mark {
+    width: 48px;
+    height: 48px;
+    border: 1.5px solid var(--accent);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--accent);
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-weight: 300;
+    letter-spacing: 0.3px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 440px;
+    margin-bottom: 16px;
+  }
+
+  /* Upload zone */
+  .upload-zone {
+    border: 1.5px dashed var(--border);
+    border-radius: 12px;
+    padding: 32px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    background: var(--surface2);
+  }
+
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(200, 169, 110, 0.05);
+  }
+
+  .upload-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .upload-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .upload-text {
+    font-size: 15px;
+    color: var(--text);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .upload-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Preview */
+  #preview-container {
+    display: none;
+    margin-top: 16px;
+    position: relative;
+  }
+
+  #preview-img {
+    width: 100%;
+    border-radius: 10px;
+    max-height: 300px;
+    object-fit: contain;
+    background: var(--surface2);
+  }
+
+  .change-photo {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0,0,0,0.7);
+    color: var(--text);
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* Participants */
+  .field-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    resize: none;
+    height: 72px;
+    line-height: 1.5;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  textarea::placeholder { color: var(--text-muted); }
+
+  /* Button */
+  .btn-send {
+    width: 100%;
+    max-width: 440px;
+    padding: 16px;
+    background: var(--accent);
+    color: #0f0f0f;
+    border: none;
+    border-radius: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: 0.2px;
+  }
+
+  .btn-send:hover:not(:disabled) {
+    background: var(--accent2);
+    transform: translateY(-1px);
+  }
+
+  .btn-send:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Status */
+  #status {
+    width: 100%;
+    max-width: 440px;
+    margin-top: 16px;
+    display: none;
+  }
+
+  .status-box {
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .status-box.loading {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .status-box.success {
+    background: rgba(76, 175, 125, 0.08);
+    border: 1px solid rgba(76, 175, 125, 0.25);
+    color: var(--success);
+  }
+
+  .status-box.error {
+    background: rgba(224, 85, 85, 0.08);
+    border: 1px solid rgba(224, 85, 85, 0.25);
+    color: var(--error);
+  }
+
+  .status-box.analyse {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .analyse-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  .analyse-content {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.8;
+    white-space: pre-wrap;
+  }
+
+  /* Spinner */
+  .spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  .api-key-field {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    transition: border-color 0.2s;
+  }
+
+  .api-key-field:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .api-key-field::placeholder { color: var(--text-muted); }
+
+  .steps {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .step {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+
+  .step.active { background: var(--accent); }
+  .step.done { background: var(--success); }
+
+  footer {
+    margin-top: 32px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">FL</div>
+  <h1>Note de frais</h1>
+  <p class="subtitle">FL Conseil & Patrimoine · SIREN 419513264</p>
+</header>
+
+<div class="steps" style="width:100%;max-width:440px">
+  <div class="step active" id="step1"></div>
+  <div class="step" id="step2"></div>
+  <div class="step" id="step3"></div>
+</div>
+
+<!-- Clé API -->
+<div class="card" id="api-card">
+  <p class="section-title">🔑 Clé API Anthropic</p>
+  <input type="password" class="api-key-field" id="api-key" placeholder="sk-ant-..." />
+  <p style="font-size:11px;color:var(--text-muted);margin-top:8px;">Stockée localement, jamais envoyée ailleurs que l'API Anthropic.</p>
+</div>
+
+<!-- Photo -->
+<div class="card">
+  <p class="section-title">📸 Photo du ticket</p>
+  <div class="upload-zone" id="upload-zone">
+    <input type="file" id="file-input" accept="image/*" capture="environment" />
+    <span class="upload-icon">🧾</span>
+    <p class="upload-text">Prendre une photo ou choisir</p>
+    <p class="upload-hint">JPG, PNG · max 10 Mo</p>
+  </div>
+  <div id="preview-container">
+    <img id="preview-img" alt="Aperçu ticket" />
+    <button class="change-photo" onclick="resetPhoto()">Changer</button>
+  </div>
+</div>
+
+<!-- Participants -->
+<div class="card">
+  <p class="field-label">Participants (facultatif)</p>
+  <textarea id="participants" placeholder="Ex : Audrey Marti (salariée), Adrien Lefevre..."></textarea>
+</div>
+
+<!-- Bouton -->
+<button class="btn-send" id="btn-send" onclick="handleSend()" disabled>
+  <span>✉️</span> Analyser et envoyer à Gaëlle
+</button>
+
+<!-- Status -->
+<div id="status"></div>
+
+<footer>
+  Envoi vers gaelle.bouvier@adrien-gaupillat-conseil.fr
+</footer>
+
+<script>
+  let selectedFile = null;
+  let selectedBase64 = null;
+
+  // Restore API key
+  const savedKey = localStorage.getItem('fl_api_key');
+  if (savedKey) document.getElementById('api-key').value = savedKey;
+
+  document.getElementById('api-key').addEventListener('input', function() {
+    localStorage.setItem('fl_api_key', this.value);
+    checkReady();
+  });
+
+  document.getElementById('file-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    selectedFile = file;
+
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        const maxSize = 1600;
+        if (w > maxSize || h > maxSize) {
+          if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+          else { w = Math.round(w * maxSize / h); h = maxSize; }
+        }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const compressed = canvas.toDataURL('image/jpeg', 0.82);
+        selectedBase64 = compressed.split(',')[1];
+        document.getElementById('preview-img').src = ev.target.result;
+        document.getElementById('preview-container').style.display = 'block';
+        document.getElementById('upload-zone').style.display = 'none';
+        setStep(2);
+        checkReady();
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  function resetPhoto() {
+    selectedFile = null;
+    selectedBase64 = null;
+    document.getElementById('preview-container').style.display = 'none';
+    document.getElementById('upload-zone').style.display = 'block';
+    document.getElementById('file-input').value = '';
+    setStep(1);
+    checkReady();
+  }
+
+  function checkReady() {
+    const key = document.getElementById('api-key').value.trim();
+    const ready = key.startsWith('sk-ant-') && selectedBase64;
+    document.getElementById('btn-send').disabled = !ready;
+    if (ready) setStep(3);
+  }
+
+  function setStep(n) {
+    for (let i = 1; i <= 3; i++) {
+      const el = document.getElementById('step' + i);
+      if (i < n) el.className = 'step done';
+      else if (i === n) el.className = 'step active';
+      else el.className = 'step';
+    }
+  }
+
+  function showStatus(type, content) {
+    const el = document.getElementById('status');
+    el.style.display = 'block';
+    el.innerHTML = `<div class="status-box ${type}">${content}</div>`;
+  }
+
+  async function handleSend() {
+    const apiKey = document.getElementById('api-key').value.trim();
+    const participants = document.getElementById('participants').value.trim();
+    const btn = document.getElementById('btn-send');
+
+    btn.disabled = true;
+    showStatus('loading', '<div class="spinner"></div><span>Analyse du ticket en cours…</span>');
+
+    // Force image type
+    const mediaType = 'image/jpeg';
+
+    // Step 1: Analyse with Claude
+    let analyse = '';
+    try {
+      const participantsText = participants ? `\nParticipants au repas : ${participants}` : '';
+      const prompt = `Analyse ce ticket de caisse pour la société FL Conseil & Patrimoine (SIREN 419513264).${participantsText}
+      
+Réponds avec un e-mail professionnel structuré en français contenant :
+- Date et heure
+- Fournisseur (nom, adresse, SIRET si visible)
+- Nature de la dépense
+- Participants (si fournis)
+- Montant HT, TVA détaillée, Montant TTC
+- Commentaire comptable (déductibilité, TVA récupérable, etc.)
+
+Commence directement par le contenu de l'e-mail, sans introduction.`;
+
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1000,
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'image', source: { type: 'base64', media_type: mediaType, data: selectedBase64 } },
+              { type: 'text', text: prompt }
+            ]
+          }]
+        })
+      });
+
+      const data = await resp.json();
+      if (!data.content) throw new Error(data.error?.message || 'Erreur API Claude');
+      analyse = data.content[0].text;
+
+    } catch (err) {
+      showStatus('error', '❌ Erreur lors de l\'analyse : ' + err.message);
+      btn.disabled = false;
+      return;
+    }
+
+    showStatus('loading', '<div class="spinner"></div><span>Envoi de l\'e-mail à Gaëlle…</span>');
+
+    // Step 2: Send email via mailto (opens Mail app)
+    // We use a hidden form approach to trigger mail with attachment via Web Share API or mailto
+    
+    // Try Web Share API first (works on iOS Safari)
+    const subject = encodeURIComponent('Note de frais – FL Conseil & Patrimoine');
+    
+    if (navigator.share && selectedFile) {
+      try {
+        await navigator.share({
+          title: 'Note de frais – FL Conseil & Patrimoine',
+          text: analyse,
+          files: [selectedFile]
+        });
+        showStatus('success', '✅ Partagé avec succès ! Choisis Mail et envoie à gaelle.bouvier@adrien-gaupillat-conseil.fr');
+        btn.disabled = false;
+        return;
+      } catch(e) {
+        // fallback to mailto
+      }
+    }
+
+    // Fallback: mailto with body (no attachment possible via mailto)
+    const mailtoBody = encodeURIComponent(analyse + '\n\n⚠️ Merci de joindre manuellement la photo du ticket.');
+    const mailto = `mailto:gaelle.bouvier@adrien-gaupillat-conseil.fr?subject=${subject}&body=${mailtoBody}`;
+    
+    // Show analysis and mailto link
+    showStatus('analyse', `
+      <div class="analyse-title">✅ Analyse terminée</div>
+      <div class="analyse-content">${analyse.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        <a href="${mailto}" style="display:block;text-align:center;padding:12px;background:var(--accent);color:#0f0f0f;border-radius:10px;text-decoration:none;font-weight:500;font-size:14px;">
+          📨 Ouvrir dans Mail avec ce texte
+        </a>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:8px;text-align:center;">La photo s'ajoutera automatiquement si tu utilises le bouton Partager ci-dessus</p>
+      </div>
+    `);
+    
+    btn.disabled = false;
+  }
+
+  // Drag & drop
+  const zone = document.getElementById('upload-zone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) document.getElementById('file-input').files = e.dataTransfer.files;
+    document.getElementById('file-input').dispatchEvent(new Event('change'));
+  });
+
+  async function shareWithPhoto(encodedText) {
+    const text = decodeURIComponent(encodedText);
+    if (navigator.share) {
+      try {
+        const shareData = {
+          title: 'Note de frais – FL Conseil & Patrimoine',
+          text: 'À envoyer à : gaelle.bouvier@adrien-gaupillat-conseil.fr\n\n' + text,
+        };
+        if (selectedFile && navigator.canShare && navigator.canShare({ files: [selectedFile] })) {
+          shareData.files = [selectedFile];
+        }
+        await navigator.share(shareData);
+        return;
+      } catch(e) {
+        if (e.name !== 'AbortError') console.error(e);
+      }
+    }
+    // Fallback: copy to clipboard
+    copyText(encodedText);
+  }
+
+  function copyText(encodedText) {
+    const text = decodeURIComponent(encodedText);
+    navigator.clipboard.writeText('À : gaelle.bouvier@adrien-gaupillat-conseil.fr\n\n' + text).then(() => {
+      showStatus('success', '✅ Texte copié ! Colle-le dans un e-mail à gaelle.bouvier@adrien-gaupillat-conseil.fr avec la photo en pièce jointe.');
+    });
+  }
+
+</script>
+</body>
+</html>
